@@ -17,11 +17,16 @@ pipeline {
         stage('Build All Microservices') {
             steps {
                 script {
-                    SERVICES.split().each { service ->
-                        def servicePath = "${env.WORKSPACE}/${service}"
-                        def pomFile = new File(servicePath, "pom.xml")
+                    def workspace = pwd()
+                    def serviceList = SERVICES.split()
 
-                        if (pomFile.exists()) {
+                    for (service in serviceList) {
+                        def pomPath = "${workspace}/${service}/pom.xml"
+
+                        // Check if the pom.xml file exists
+                        def pomExists = fileExists(pomPath)
+
+                        if (pomExists) {
                             echo "⚙️ Building ${service} using Maven inside Docker..."
                             bat """
                                 docker run --rm ^

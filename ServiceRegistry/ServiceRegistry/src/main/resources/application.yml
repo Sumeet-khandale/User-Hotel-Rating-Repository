@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 
+=======
+spring:
+  application:
+    name: Service-Registry
+>>>>>>> bd484bc (Updated files)
 eureka:
   instance:
     hostname: localhost

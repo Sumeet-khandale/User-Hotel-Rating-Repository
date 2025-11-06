@@ -18,14 +18,21 @@ pipeline {
             steps {
                 script {
                     SERVICES.split().each { service ->
-                        echo "⚙️ Building ${service} inside Docker container..."
-                        bat """
-                        docker run --rm ^
-                            -v "%cd%:/workspace" ^
-                            -w /workspace/${service} ^
-                            maven:3.9.9-eclipse-temurin-17 ^
-                            mvn clean package -DskipTests
-                        """
+                        def servicePath = "${env.WORKSPACE}/${service}"
+                        def pomFile = new File(servicePath, "pom.xml")
+
+                        if (pomFile.exists()) {
+                            echo "⚙️ Building ${service} using Maven inside Docker..."
+                            bat """
+                                docker run --rm ^
+                                    -v "%cd%:/workspace" ^
+                                    -w /workspace/${service} ^
+                                    maven:3.9.9-eclipse-temurin-17 ^
+                                    mvn clean package -DskipTests
+                            """
+                        } else {
+                            echo "⚠️ Skipping ${service} — No pom.xml found."
+                        }
                     }
                 }
             }
